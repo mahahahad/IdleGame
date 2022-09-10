@@ -1,8 +1,10 @@
-# The Essence of Idle Games
+# Generic Idle Game
 
 ## Functionality
 
-- make total incrementable through some manual way
-- total incrementation can also become automatic through upgrades
-- listen for pagehide event and store in local storage
-- new_total = rate \* duration_passed, everytime page is reloaded
+- Manually incrementable total
+- Automatically incrementable total
+- On 'pagehide' event, all variables are stored in localStorage
+- total += secRate \* durationInSec, everytime page is re-opened
+
+The only thing missing now is the actual story.
