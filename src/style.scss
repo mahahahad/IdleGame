@@ -1,0 +1,261 @@
+// Center content with a flexbox
+// Parameter:
+//  jc -> the justification between each element of the parent
+@mixin center($jc, $ff) {
+  display: flex;
+  align-items: center;
+  justify-content: $jc;
+  flex-flow: $ff;
+}
+
+$tones: 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99, 100;
+$hue-primary: 280;
+$hue-neutral: 210;
+
+$Primary0: hsl($hue-primary, 0%, 0%);
+
+$surface5: transparentize(hsl($hue-primary, 38%, 40%), 0.82);
+
+$fontSans: "Figtree";
+
+:root {
+  // General things
+  font-family: $fontSans;
+  --fs-content: clamp(14px, 1.85vmin, 18px);
+  --fs-medium: clamp(24px, 3.25vmin, 32px);
+
+  --easing: cubic-bezier(0.22, 1, 0.36, 1);
+
+  $toneOffset: "";
+
+  @each $tone in $tones {
+    @if $tone < 90 {
+      $toneOffset: $tone * 0.25;
+    }
+    --Neutral#{$tone}: hsl(
+      #{$hue-neutral},
+      #{$toneOffset + "%"},
+      #{$tone + "%"}
+    );
+  }
+
+  @each $tone in $tones {
+    --Primary#{$tone}: hsl(#{$hue-primary}, #{$tone + "%"}, #{$tone + "%"});
+  }
+
+  --primary: var(--Primary40);
+  --on-primary: white;
+  --primary-container: var(--Primary90);
+  --on-primary-container: var(--Primary10);
+  --background: var(--Neutral99);
+  --on-background: var(--Neutral10);
+  --outline: var(--Neutral50);
+  --surface5: $surface5;
+}
+
+// || GENERAL
+body {
+  // Center all body content
+  @include center(center, column nowrap);
+
+  background-color: var(--background);
+  color: var(--on-background);
+  height: 100vh;
+  width: 100vw;
+
+  // Don't let things exceed viewport
+  overflow: hidden;
+}
+
+li {
+  list-style-type: "—  ";
+  line-height: 200%;
+  font-size: var(--fs-content);
+}
+
+h1 {
+  font: 500 64px/72px $fontSans;
+}
+
+h1,
+h2 {
+  text-align: center;
+}
+
+.title {
+  font-weight: 500;
+  font-size: clamp(32px, 3.75vmin, 36px);
+  line-height: 42px;
+}
+
+.content {
+  font-weight: 400;
+  font-size: var(--fs-content);
+  line-height: calc(1ex / 0.38);
+  text-align: justify;
+}
+
+.hidden {
+  // ANYTHING with this class will not be displayed
+  // It will basically be removed from the DOM
+  display: none !important;
+}
+
+.close-icon {
+  width: var(--fs-medium);
+  cursor: pointer;
+  fill: var(--on-background);
+  transition: fill 350ms var(--easing);
+  &:hover {
+    fill: var(--primary);
+  }
+}
+
+// || BUTTONS
+.btn {
+  padding: 0.85rem 2.25rem;
+  border: none;
+  border-radius: 28px;
+  cursor: pointer;
+  font-size: var(--fs-content);
+  font-weight: 500;
+  transition: background-color 350ms var(--easing), color 350ms var(--easing);
+  &--primary {
+    background-color: var(--primary);
+    color: var(--on-primary);
+    &:hover {
+      background-color: var(--Primary30);
+    }
+  }
+  &--outlined {
+    background-color: transparent;
+    color: var(--on-background);
+    border: 1px solid var(--outline);
+    &:hover {
+      background-color: var(--Neutral80);
+    }
+  }
+  &--text {
+    background: none;
+    color: var(--primary);
+    border: none;
+    &:hover {
+      color: var(--on-background);
+    }
+  }
+}
+
+// || DIALOG
+.dialog-wrapper {
+  // Center content
+  @include center(center, column nowrap);
+
+  // Make background darker to show importance
+  background: rgba(0, 0, 0, 0.4);
+
+  // Blur everything behind
+  backdrop-filter: blur(4px);
+
+  // Take up full browser viewport size
+  height: 100vh;
+
+  // Position fixed to make it appear above all other elements
+  position: fixed;
+  z-index: 2;
+}
+
+.dialog {
+  // Set up colours for ez dark mode
+  background: var(--background);
+  color: var(--on-background);
+  padding: 36px;
+  border-radius: 28px;
+  box-shadow: 0 0.75rem 4rem 0.25rem rgba(25, 26, 27, 0.1);
+
+  &__header {
+    @include center(space-between, row nowrap);
+    margin-bottom: 16px;
+  }
+
+  &__actions {
+    margin-top: 2rem;
+    display: flex;
+    gap: 0.5rem;
+    text-align: right;
+
+    button {
+      // Take up full width on small screens
+      flex-grow: 1;
+    }
+  }
+}
+
+// || SNACKBAR
+.snackbar-wrapper {
+  // Appear above other element but under dialog
+  position: fixed;
+  z-index: 1;
+  bottom: 0;
+  width: 100vw;
+}
+
+.snackbar {
+  @include center(space-between, row nowrap);
+  background: $surface5;
+  color: var(--on-background);
+  transform: translateY(15px);
+  box-shadow: 0 4px 8px 2px rgba(0, 0, 0, 0.2);
+  padding: 1rem;
+  margin: 0.5rem;
+  border-radius: 8px;
+}
+
+.dialog-wrapper,
+.snackbar-wrapper {
+  // Take up full width of viewport
+  width: 100vw;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.dialog,
+.snackbar {
+  // Initially transparent and offset a little
+  // This is to make it look nice when it becomes visible
+  opacity: 0;
+  transform: translateY(10px);
+
+  transition: opacity 500ms var(--easing), transform 500ms var(--easing);
+}
+
+// || MEDIA QUERIES
+// Larger screen sizes
+@media (min-width: 500px) {
+  .dialog {
+    max-width: 720px;
+  }
+  .dialog__actions {
+    display: block;
+  }
+  .snackbar {
+    max-width: 420px;
+  }
+}
+// Dark mode
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary: var(--Primary80);
+    --on-primary: var(--Primary20);
+    --primary-container: var(--Primary30);
+    --on-primary-container: var(--Primary90);
+    --background: var(--Neutral10);
+    --on-background: var(--Neutral99);
+    --outline: var(--Neutral40);
+  }
+  .btn--primary:hover {
+    background-color: var(--Primary70);
+  }
+  .btn--outlined:hover {
+    background-color: var(--Neutral20);
+  }
+}
